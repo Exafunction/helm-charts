@@ -1,0 +1,12 @@
+exafunction:
+  apiKeySecret:
+    name: "api-key-secret"
+
+scheduler:
+  image: "foo.us-west-1.amazonaws.com/scheduler:bar_1234"
+
+moduleRepository:
+  image: "foo.us-west-1.amazonaws.com/moduleRepository:bar_1234"
+
+runner:
+  image: "foo.us-west-1.amazonaws.com/runner:bar_1234"

@@ -1,0 +1,25 @@
+---
+# Source: exadeploy/templates/module-repository-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: module-repository-service
+  namespace: default
+  annotations:
+    cloud.google.com/load-balancer-type: Internal
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+  labels:
+    helm.sh/chart: exadeploy-1.0.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ports:
+  - name: grpc
+    port: 50051
+    targetPort: 50051
+  selector:
+    app: module-repository
+  type: LoadBalancer

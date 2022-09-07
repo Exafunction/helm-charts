@@ -1,0 +1,15 @@
+{{- if .Values.runner.createHeadlessService }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless{{- include "exadeploy.suffix" . }}
+spec:
+  selector:
+    app: exafunction-runner{{- include "exadeploy.suffix" . }}
+  clusterIP: None
+  ports:
+  - name: runner-port
+    port: {{ .Values.runner.port }}
+  - name: value-store-port
+    port: {{ .Values.runner.valueStorePort }}
+{{- end }}

@@ -1,0 +1,1468 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: exafunction-grafana-dashboard{{- include "exadeploy.suffix" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "exadeploy.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  exafunction.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "$$hashKey": "object:3607",
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "Summary metrics about containers running on Kubernetes nodes.\r\n\r\nDashboard was taken from here.  This version does not reqiure you to\r\nsetup the Kubernetes-app plugin. (https://github.com/grafana/kubernetes-app)\r\n\r\nUse this Helm chart to launch Grafana into a Kubernetes cluster.  It will include this dashboard and many more dashboards to give you visibility into the Kubernetes Cluster. (https://github.com/sekka1/cloud-public/tree/master/kubernetes/pods/grafana-helm)",
+      "editable": true,
+      "gnetId": 6417,
+      "graphTooltip": 1,
+      "id": 9,
+      "iteration": 1646341735425,
+      "links": [
+        {
+          "asDropdown": true,
+          "icon": "external link",
+          "includeVars": true,
+          "keepTime": false,
+          "tags": [
+            "kubernetes-app"
+          ],
+          "title": "Dashboards",
+          "type": "dashboards"
+        }
+      ],
+      "panels": [
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 0
+          },
+          "id": 57,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum(group by (kubernetes_pod_name) (grpc_server_handled_total{grpc_service=\"exa.runner_pb.Runner\", kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"})) OR on() vector(0)",
+              "interval": "",
+              "legendFormat": "Number of Exafunction runners",
+              "refId": "A"
+            }
+          ],
+          "title": "Number of Exafunction GPU runners (use runner name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 0
+          },
+          "id": 89,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "avg(rate(module_server_exec_time[${rate_interval}])) OR on() vector(0)\n",
+              "interval": "",
+              "legendFormat": "Exec Time (s)",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "avg(rate(module_server_exec_lock_time[${rate_interval}])) OR on() vector(0)\n",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Exec Lock Time (s)",
+              "refId": "B"
+            },
+            {
+              "exemplar": true,
+              "expr": "avg(rate(module_server_map_data_time[${rate_interval}])) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Map Data Time (s)",
+              "refId": "C"
+            },
+            {
+              "exemplar": true,
+              "expr": "avg(rate(module_server_allocate_time[${rate_interval}])) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Allocate Time (s)",
+              "refId": "D"
+            },
+            {
+              "exemplar": true,
+              "expr": "min(rate(module_server_exec_time[${rate_interval}])) OR on() vector(0)\n",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Min Exec Time (s)",
+              "refId": "E"
+            }
+          ],
+          "title": "Average Module Server Stats",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 8
+          },
+          "id": 71,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "avg(runner_cpu_utilization{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"})",
+              "interval": "",
+              "legendFormat": "CPU",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "avg(value_store_cpu_utilization{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"})",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Value Store CPU",
+              "refId": "C"
+            },
+            {
+              "exemplar": true,
+              "expr": "avg(runner_process_cpu_utilization{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"})",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Runner Process CPU",
+              "refId": "D"
+            },
+            {
+              "exemplar": true,
+              "expr": "avg(runner_gpu_utilization{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"})",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "GPU",
+              "refId": "B"
+            },
+            {
+              "exemplar": true,
+              "expr": "100.0 * sum(runner_gpu_used_memory{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"}) / sum(runner_gpu_total_memory{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"})",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "GPU Memory",
+              "refId": "E"
+            }
+          ],
+          "title": "Average Runner Utilization (use runner name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 8
+          },
+          "id": 61,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "avg(rate(value_store_bytes_transferred_to_gpu{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"}[${rate_interval}])) / 1e9 OR on() vector(0)\n",
+              "interval": "",
+              "legendFormat": "Total Transferred to GPU (GB/s)",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "avg(rate(value_store_bytes_transferred_from_gpu{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"}[${rate_interval}])) / 1e9 OR on() vector(0)\n",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Total Transferred from GPU (GB/s)",
+              "refId": "B"
+            }
+          ],
+          "title": "Average Runner GPU Bandwidth (use runner name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 16
+          },
+          "id": 51,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum(rate(grpc_server_handled_total{grpc_method=\"RunMethod\",kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"}[${rate_interval}])) OR on() vector(0)",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "Method calls per second",
+              "refId": "A"
+            }
+          ],
+          "title": "Overall Method Run Throughput (use runner name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 16
+          },
+          "id": 69,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "avg(grpc_server_handling_seconds_sum{grpc_method=\"LoadPlacementGroup\", kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"})",
+              "interval": "",
+              "legendFormat": "Load latency",
+              "refId": "A"
+            }
+          ],
+          "title": "Placement Group Load Time (use runner name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 24
+          },
+          "id": 59,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "avg(rate(value_store_bytes_received{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"}[${rate_interval}])) / 1e6 OR on() vector(0)",
+              "interval": "",
+              "legendFormat": "Total Receive Bandwidth (MB/s)",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "avg(rate(value_store_bytes_sent{kubernetes_pod_name=~\"[[runner_name]]-[0-9]{20}\"}[${rate_interval}])) / 1e6 OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Total Send Bandwidth (MB/s)",
+              "refId": "B"
+            }
+          ],
+          "title": "Average Runner Network Bandwidth (use runner name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 24
+          },
+          "id": 93,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum(rate(grpc_server_bytes_received_total{grpc_service=\"exa.module_repository_pb.ModuleRepository\"}[${rate_interval}])) / 1e6 OR on() vector(0)",
+              "interval": "",
+              "legendFormat": "Total Receive Bandwidth (MB/s)",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "sum(rate(grpc_server_bytes_sent_total{grpc_service=\"exa.module_repository_pb.ModuleRepository\"}[${rate_interval}])) / 1e6 OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Total Send Bandwidth (MB/s)",
+              "refId": "B"
+            }
+          ],
+          "title": "Average Module repository Network Bandwidth",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 32
+          },
+          "id": 74,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "SUM(scheduler_cpu_utilization{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"})",
+              "interval": "",
+              "legendFormat": "Scheduler CPU Utilization",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "B"
+            }
+          ],
+          "title": "Scheduler CPU Utilization (use scheduler name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 32
+          },
+          "id": 90,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "SUM(scheduler_memory_usage{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}) / 1e9",
+              "interval": "",
+              "legendFormat": "Scheduler Memory Usage (GB)",
+              "refId": "A"
+            }
+          ],
+          "title": "Scheduler Memory Usage (use scheduler name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 40
+          },
+          "id": 77,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "SUM(scheduler_created_sessions{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}) OR on() vector(0)",
+              "interval": "",
+              "legendFormat": "Created sessions",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "SUM(scheduler_pending_sessions{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Pending sessions",
+              "refId": "B"
+            },
+            {
+              "exemplar": true,
+              "expr": "SUM(scheduler_created_runners{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Created runners",
+              "refId": "C"
+            },
+            {
+              "exemplar": true,
+              "expr": "SUM(scheduler_pending_runners{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Pending runners",
+              "refId": "D"
+            }
+          ],
+          "title": "Scheduler Stats (use scheduler name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 40
+          },
+          "id": 75,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum(rate(scheduler_processing_time{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}[${rate_interval}])) OR on() vector(0)",
+              "interval": "",
+              "legendFormat": "Scheduler Processing Time",
+              "refId": "A"
+            }
+          ],
+          "title": "Scheduler Processing Time (use scheduler name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 48
+          },
+          "id": 73,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "histogram_quantile(0.5, rate(scheduler_runner_pod_creation_seconds_bucket{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}[${rate_interval}]))",
+              "interval": "",
+              "legendFormat": "p50 (s)",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "histogram_quantile(0.95, rate(scheduler_runner_pod_creation_seconds_bucket{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}[${rate_interval}]))",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "p95 (s)",
+              "refId": "B"
+            }
+          ],
+          "title": "Scheduler Pod Creation Time (use scheduler name filter)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": null,
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 48
+          },
+          "id": 76,
+          "interval": "5s",
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "single"
+            }
+          },
+          "targets": [
+            {
+              "exemplar": true,
+              "expr": "sum(rate(scheduler_invocations{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}[${rate_interval}])) OR on() vector(0)",
+              "interval": "",
+              "legendFormat": "Scheduler Invocations",
+              "refId": "A"
+            },
+            {
+              "exemplar": true,
+              "expr": "sum(scheduler_requests_queued{kubernetes_pod_name=~\"[[scheduler_name]]-[a-z0-9]+-[a-z0-9]+\"}) OR on() vector(0)",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Requests queued",
+              "refId": "B"
+            }
+          ],
+          "title": "Scheduler Invocations (use scheduler name filter)",
+          "type": "timeseries"
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 30,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": [
+          {
+            "current": {
+              "selected": false,
+              "text": "runner{{- include "exadeploy.suffix" . }}",
+              "value": "runner{{- include "exadeploy.suffix" . }}"
+            },
+            "description": null,
+            "error": null,
+            "hide": 0,
+            "label": "Runner Name",
+            "name": "runner_name",
+            "options": [
+              {
+                "selected": true,
+                "text": "runner{{- include "exadeploy.suffix" . }}",
+                "value": "runner{{- include "exadeploy.suffix" . }}"
+              }
+            ],
+            "query": "runner{{- include "exadeploy.suffix" . }}",
+            "skipUrlSync": false,
+            "type": "textbox"
+          },
+          {
+            "current": {
+              "selected": false,
+              "text": "scheduler{{- include "exadeploy.suffix" . }}",
+              "value": "scheduler{{- include "exadeploy.suffix" . }}"
+            },
+            "description": null,
+            "error": null,
+            "hide": 0,
+            "label": "Scheduler Name",
+            "name": "scheduler_name",
+            "options": [
+              {
+                "selected": true,
+                "text": "scheduler{{- include "exadeploy.suffix" . }}",
+                "value": "scheduler{{- include "exadeploy.suffix" . }}"
+              }
+            ],
+            "query": "scheduler{{- include "exadeploy.suffix" . }}",
+            "skipUrlSync": false,
+            "type": "textbox"
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": "auto",
+              "value": "$__rate_interval"
+            },
+            "hide": 0,
+            "includeAll": false,
+            "label": "Rate Interval",
+            "multi": false,
+            "name": "rate_interval",
+            "options": [
+              {
+                "selected": true,
+                "text": "auto",
+                "value": "$__rate_interval"
+              },
+              {
+                "selected": false,
+                "text": "30s",
+                "value": "30s"
+              },
+              {
+                "selected": false,
+                "text": "1m",
+                "value": "1m"
+              },
+              {
+                "selected": false,
+                "text": "3m",
+                "value": "3m"
+              },
+              {
+                "selected": false,
+                "text": "5m",
+                "value": "5m"
+              },
+              {
+                "selected": false,
+                "text": "10m",
+                "value": "10m"
+              }
+            ],
+            "query": "auto : $__rate_interval,30s,1m,3m,5m,10m",
+            "queryValue": "",
+            "skipUrlSync": false,
+            "type": "custom"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-30m",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ],
+        "time_options": [
+          "5m",
+          "15m",
+          "1h",
+          "6h",
+          "12h",
+          "24h",
+          "2d",
+          "7d",
+          "30d"
+        ]
+      },
+      "timezone": "browser",
+      "title": "Exafunction Cluster Monitoring",
+      "uid": "yuwibKY7z",
+      "version": 3
+    }

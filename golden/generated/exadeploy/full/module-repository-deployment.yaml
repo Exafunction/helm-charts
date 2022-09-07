@@ -1,0 +1,91 @@
+---
+# Source: exadeploy/templates/module-repository-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-repository-example
+  namespace: default
+  labels:
+    app: module-repository-example
+    helm.sh/chart: exadeploy-1.0.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: module-repository-example
+  template:
+    metadata:
+      labels:
+        app: module-repository-example
+      annotations:
+        checksum/config: b9d072586f7a1be7ae75bac055bfd46abf78b068c036f93ec12f110a5b10d531
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "21120"
+        my-annotation: my-value
+    spec:
+      serviceAccountName: "my-module-repository-serviceaccount"
+      nodeSelector:
+        role: module-repository
+      tolerations:
+      - effect: NoSchedule
+        key: dedicated
+        operator: Equal
+        value: module-repository
+      containers:
+      - name: module-repository
+        image: foo.us-west-1.amazonaws.com/moduleRepository:bar_1234
+        args : [
+          "-config=/etc/config/exafunction_config.pbtxt",
+        ]
+        ports:
+        - containerPort: 51
+          protocol: TCP
+        - name: metrics
+          containerPort: 21120
+          protocol: TCP
+        resources:
+          requests:
+            memory: "3.5Gi"
+            cpu: "1"
+          limits:
+            memory: "3.5Gi"
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: "aws-secret"
+              key: "access_key_custom"
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "aws-secret"
+              key: "secret_key_custom"
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/config"
+          readOnly: true
+        - name: system-secrets
+          mountPath: /etc/system_secrets
+          readOnly: true
+        - name: ssl-cert
+          mountPath: /etc/ssl-cert
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: exafunction-config-example
+      - name: system-secrets
+        projected:
+          sources:
+          - secret:
+              name: "postgres-secret"
+              items:
+              - key: "postgres_password_custom"
+                path: postgres_password
+      - name: ssl-cert
+        configMap:
+          name: postgres-ssl-cmap

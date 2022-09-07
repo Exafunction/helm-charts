@@ -1,0 +1,65 @@
+---
+# Source: exadeploy/templates/exafunction-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: exafunction-config
+  namespace: default
+  labels:
+    helm.sh/chart: exadeploy-1.0.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  exafunction_config.pbtxt: |+
+    module_repository {
+      listen_port: 50051
+      hostname: "module-repository-service.default.svc.cluster.local"
+      cache_dir: "/tmp/module_repository/cache"
+      max_cache_size_in_gb: 50
+      local_data_backend {}
+      local_metadata_backend {
+        base_dir: "/tmp/exafunction/module_repository/metadata"
+      }
+      
+    }
+    
+    scheduler {
+      hostname: "scheduler-service"
+      listen_port: 50050
+      session_reinitialization_first_heartbeat_timeout_seconds: 60
+      placement_group_deletion_lag_seconds: 5
+      log_invocation_time: true
+      runner_creation_timeout_seconds: 600
+      max_consecutive_runner_creation_failures: 5
+      runner_create_failure_cooldown_seconds: 100
+      runner_service_creation_timeout_seconds: 600
+      runner_deletion_lag_seconds: 5
+      load_balancing_enabled: true
+      autoscaling_enabled: true
+      autoscaling_config {}
+      use_runner_image_from_module: true
+      
+    }
+    
+    runner {
+      kubernetes_launch_backend {
+        docker_image: "foo.us-west-1.amazonaws.com/runner:bar_1234",
+        runner_port: 50100
+        value_store_port: 50101
+        namespace: "default"
+        runner_pod_app_label_value: "exafunction-runner"
+        runner_service_app_label_value: "exafunction-runner-service"
+        service_account_name: "exadeploy"
+        external_service_hostname: ""
+      }
+      value_store_threads: 4
+      
+    }
+    
+    metrics_export_port: 2112
+    
+    billing_addr: "https://billing.exafunction.com"
+    
+    kubernetes_secret_dir: "/etc/system_secrets"

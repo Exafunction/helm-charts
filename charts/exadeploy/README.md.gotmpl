@@ -1,0 +1,152 @@
+{{ template "chart.header" . }}
+
+<img src="../../images/banner.png" alt="Banner" width="1280"/>
+
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.badgesSection" . }}
+
+## Get Helm Repository Info
+
+```console
+helm repo add exafunction https://exafunction.github.io/helm-charts/
+helm repo update
+```
+
+*See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation.*
+
+## Install Chart
+
+```console
+helm install [RELEASE_NAME] exafunction/exadeploy
+```
+
+*See [Configuration](#configuration) section below.*
+
+*See [helm install](https://helm.sh/docs/helm/helm_install/) for command documentation.*
+
+## Uninstall Helm Chart
+
+```console
+helm uninstall [RELEASE_NAME]
+```
+
+This removes all the Kubernetes components associated with the chart and deletes the release.
+
+*See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command documentation.*
+
+## Upgrade Chart
+
+```console
+helm upgrade [RELEASE_NAME] exafunction/exadeploy
+```
+
+*See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documentation.*
+
+## Configuration
+
+This section covers the most common configuration options. To see all configuration options with detailed comments, see the [Values](#values) section, check out the [values.yaml](values.yaml) file, or use the CLI:
+
+```console
+helm show values exafunction/exadeploy
+```
+
+*See [helm show values](https://helm.sh/docs/helm/helm_show_values/) for command documentation.*
+
+*See [Customizing the Chart Before Installing](https://helm.sh/docs/topics/charts/#customizing-the-chart-before-installing) for instructions on how to configure the chart.*
+
+### Exafunction API Key (Required)
+In order to install this Helm chart, you **must** specify a Kubernetes secret containing the Exafunction API key. This is used to identify the ExaDeploy system and should be provided by Exafunction. The secret must exist before installing the Helm chart and by default is expected to contain a key named `api_key` with the value being the API key.
+
+Example values file:
+
+```yaml
+exafunction:
+  apiKeySecretName: exafunction-api-key
+```
+
+### ExaDeploy Component Images (Required)
+In order to install this Helm chart, you **must** specify ExaDeploy component images. These should be provided by Exafunction and determine the specific version and build of the ExaDeploy components that will be deployed.
+
+Example values file:
+
+```yaml
+scheduler:
+  image: "foo.bar.com/scheduler:abcd_1234"
+moduleRepository:
+  image: "foo.bar.com/module_repository:abcd_1234"
+runner:
+  image: "foo.bar.com/runner:abcd_1234"
+```
+
+### Module Repository Persistent Backend
+The module repository can be configured to use either a local backend on disk (default) or a remote backend backed by a Postgres database and cloud storage bucket (e.g. S3, GCS, etc.). The remote backend allows for persistence between module repository restarts and is recommended in production.
+
+In order to configure a remote backend for the module repository, you must change the `moduleRepository.backend.type` to `remote`, configure the remote Postgres connection, set the `moduleRepository.backend.remote.dataBackend` to the cloud storage provider, and configure the appropriate cloud storage provider settings. Note that the Postgres database and cloud storage bucket must already exist before installing the Helm chart. Additionally, the access information for both must exist as Kubernetes secrets.
+
+By default, the postgres password secret is expected to contain a key named `postgres_password` with the value being the password. The cloud storage secret format is provider-specific. For S3, the secret is expected to contain a key named `access_key` with the value being the access key ID and a key named `secret_key` with the value being the secret access key.
+
+Example values file:
+
+```yaml
+moduleRepository:
+  backend:
+    type: "remote"
+    postgres:
+      host: "postgres.example.com"
+      port: 5432
+      database: "exadeploy"
+      user: "exadeploy"
+      passwordSecretName: "postgres-password"
+    dataBackend: "s3"
+    s3:
+      region: "us-east-1"
+      bucket: "exadeploy"
+      awsAccessKeySecretName: "aws-access-key"
+```
+
+### Kubernetes Scheduling
+To manage scheduling of the ExaDeploy component pods on Kubernetes nodes, you can specify Kubernetes [NodeSelectors](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) and [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) for each component type.
+
+Note that runner pods will request GPU resources by default unless `runner.cpuOnly` is set to true (which causes all runners to only use CPU). If only some runners should run on CPU, clients should specify the CPU only setting at session creation time.
+
+Example values file:
+
+```yaml
+scheduler:
+  nodeSelector:
+    foo: "bar"
+  tolerations:
+  - key: "foo"
+    operator: "Equal"
+    value: "bar"
+    effect: "NoSchedule"
+moduleRepository:
+  nodeSelector:
+    foo: "bar"
+  tolerations:
+  - key: "foo"
+    operator: "Equal"
+    value: "bar"
+    effect: "NoSchedule"
+runner:
+  nodeSelector:
+    foo: "bar"
+  tolerations:
+  - key: "foo"
+    operator: "Equal"
+    value: "bar"
+    effect: "NoSchedule"
+```
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}

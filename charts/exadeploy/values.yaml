@@ -1,0 +1,182 @@
+exafunction:
+  apiKeySecret:
+    # -- Name of Kubernetes secret containing Exafunction API key.
+    name: null
+    # -- Key in <name> Kubernetes secret with Exafunction API key value.
+    key: "api_key"
+  # -- Global suffix to apply to all Kubernetes objects.
+  suffix: ""
+  # -- Annotations to add to deployments and runner pods.
+  annotations: {}
+  # -- Kubernetes cluster domain name used to construct fully qualified domain names for Exafunction services.
+  clusterDomain: "cluster.local"
+
+scheduler:
+  # -- Image path for the scheduler.
+  image: null
+  # -- Port to expose the scheduler on.
+  port: 50050
+  # -- Scheduler Kubernetes CPU limit.
+  cpuLimit: "2.5"
+  # -- Scheduler nodeSelectors. Should be a map from label names to label values.
+  nodeSelector: {}
+  # -- Scheduler tolerations. Should be a list of objects with keys [key, operator, value (unnecessary when operator is "Exists"), effect].
+  tolerations: []
+  service:
+    # -- Scheduler service type.
+    type: "LoadBalancer"
+    # -- Scheduler service annotations.
+    annotations:
+      cloud.google.com/load-balancer-type: "Internal"
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+  ingress:
+    # -- Whether to enable scheduler ingress.
+    enabled: false
+    # -- Scheduler ingress class name.
+    className: "nginx"
+    # -- Scheduler ingress host.
+    host: null
+    # -- Scheduler ingress annotations.
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+  # -- Optional specific serviceAccountName for the scheduler.
+  serviceAccountName: null
+  # -- Extra environment variables for the scheduler.
+  extraEnvs: []
+  # -- Number of seconds to wait before deleting unused placement group from runners.
+  placementGroupDeletionLagSeconds: 5
+  # -- Number of seconds to wait for runner creation.
+  runnerCreationTimeoutSeconds: 600
+  # -- Number of seconds to wait before deleting unused runner.
+  runnerDeletionLagSeconds: 5
+  # -- Minimum number of concurrent runners (default 0).
+  minRunners: null
+  # -- Maxmimum number of concurrent runners (default unbounded).
+  maxRunners: null
+  # -- Normally, the scheduler will delete runners which clients fail to connect to. This disables that behavior to allow for inspection of the failed runners.
+  disableClientsKillingRunners: false
+  # -- Additional scheduler config settings in yaml format.
+  additionalConfig: ""
+
+moduleRepository:
+  # -- Image path for the module repository.
+  image: null
+  # -- Port to expose the module repository on.
+  port: 50051
+  # -- Module repository nodeSelectors. Should be a map from label names to label values.
+  nodeSelector: {}
+  # -- Module repository tolerations. Should be a list of objects with keys [key, operator, value (unnecessary when operator is "Exists"), effect].
+  tolerations: []
+  service:
+    # -- Module repository service type.
+    type: "LoadBalancer"
+    # -- Module repository service annotations.
+    annotations:
+      cloud.google.com/load-balancer-type: "Internal"
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+  ingress:
+    # -- Whether to enable module repository ingress.
+    enabled: false
+    # -- Module repository ingress class name.
+    className: nginx
+    # -- Module repository ingress host.
+    host: null
+    # -- Module repository ingress annotations.
+    annotations:
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+  backend:
+    # -- Module repository backend type. Must be one of [local, remote].
+    type: "local"
+    local:
+      # -- Location to store metadata for the local metadata backend.
+      localMetadataBaseDir: "/tmp/exafunction/module_repository/metadata"
+    remote:
+      postgres:
+        # -- Host (address) of the Postgres instance.
+        host: null
+        # -- Port of the Postgres instance.
+        port: null
+        # -- Name of the Postgres database.
+        database: null
+        # -- Username to use when connecting to the Postgres instance.
+        user: null
+        passwordSecret:
+          # -- Name of Kubernetes secret containing password to use when connecting to the Postgres instance.
+          name: null
+          # -- Key in <name> Kubernetes secret with Postgres password value.
+          key: "postgres_password"
+        # -- If using SSL, contains the name of the .pem certificate file.
+        sslCertificateName: null
+        # -- If using SSL, contains the name of the config map containing the certificate file.
+        sslConfigMapName: null
+      # -- Module repository data backend type. Must be one of [s3]
+      dataBackend: "s3"
+      s3:
+        # -- AWS region of the S3 bucket (i.e. "us-west-1", etc.).
+        region: null
+        # -- Name of the S3 bucket used to store module repository objects.
+        bucket: null
+        awsAccessKeySecret:
+          # -- Name of Kubernetes secret containing AWS access credentials to access the S3 bucket.
+          name: null
+          # -- Key in <name> Kubernetes secret with AWS access key ID value.
+          accessKeyIdKey: "access_key"
+          # -- Key in <name> Kubernetes secret with AWS secret access key value.
+          secretAccessKeyKey: "secret_key"
+  # -- Optional specific serviceAccountName for the module repository.
+  serviceAccountName: null
+  # -- Additional module repository config settings in yaml format.
+  additionalConfig: ""
+
+runner:
+  # -- Image path for the runner.
+  image: null
+  # -- Port to expose runners on.
+  port: 50100
+  # -- Port to expose value store on.
+  valueStorePort: 50101
+  # -- Runner Kubernetes CPU limit.
+  cpuLimit: null
+  # -- Runner Kubernetes memory limit.
+  memoryLimit: null
+  # -- Runner nodeSelectors. Should be a map from label names to label values.
+  nodeSelector: {}
+  # -- Runner tolerations. Should be a list of objects with keys [key, operator, value (unnecessary when operator is "Exists"), effect].
+  tolerations: []
+  ingress:
+    # -- Whether to enable runner ingress.
+    enabled: false
+    # -- Runner ingress host.
+    host: null
+  # -- Whether to use per-runner load balancer service IPs.
+  useLoadBalancerServiceIp: false
+  # -- Whether to create a headless service to enable pod lookup by fully qualified pod hostname.
+  createHeadlessService: false
+  # -- Optional specific serviceAccountName for runners.
+  serviceAccountName: null
+  # -- Whether runners should only run on CPU.
+  cpuOnly: false
+  # -- Number of threads for value store.
+  valueStoreThreads: 4
+  # -- Whether to serialize all module execution.
+  serializeAll: false
+  # -- Additional scheduler config map settings in yaml format.
+  additionalConfig: ""
+
+prometheus:
+  # -- Controls the value of prometheus.io/port.
+  port: 2112
+
+rbac:
+  # -- Specifies whether RBAC resources should be created.
+  create: true
+
+serviceAccount:
+  # -- Specifies whether a ServiceAccount should be created.
+  create: true
+  # -- The name of the ServiceAccount to use. If not set and create is true, a name is generated automatically.
+  name: null
+  # -- ServiceAccount annotations.
+  annotations: {}

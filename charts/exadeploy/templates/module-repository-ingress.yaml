@@ -1,0 +1,24 @@
+{{- if .Values.moduleRepository.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: module-repository{{- include "exadeploy.suffix" . }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- toYaml .Values.moduleRepository.ingress.annotations | nindent 4 }}
+  labels:
+    {{- include "exadeploy.labels" . | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.moduleRepository.ingress.className }}
+  rules:
+  - host: {{ required "A valid moduleRepository.ingress.host is required" .Values.moduleRepository.ingress.host | quote }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: module-repository-service{{- include "exadeploy.suffix" . }}
+            port:
+              number: {{ .Values.moduleRepository.port }}
+        path: /
+        pathType: Prefix
+{{- end }}

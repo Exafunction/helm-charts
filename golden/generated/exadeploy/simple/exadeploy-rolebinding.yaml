@@ -1,0 +1,21 @@
+---
+# Source: exadeploy/templates/exadeploy-rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: exadeploy-rolebinding
+  namespace: default
+  labels:
+    helm.sh/chart: exadeploy-1.0.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: exadeploy-role
+subjects:
+- kind: ServiceAccount
+  name: exadeploy
+  namespace: default
