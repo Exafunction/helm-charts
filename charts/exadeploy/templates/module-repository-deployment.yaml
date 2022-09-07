@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-repository{{- include "exadeploy.suffix" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: module-repository{{- include "exadeploy.suffix" . }}
+    {{- include "exadeploy.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: module-repository{{- include "exadeploy.suffix" . }}
+  template:
+    metadata:
+      labels:
+        app: module-repository{{- include "exadeploy.suffix" . }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/exafunction-configmap.yaml") . | sha256sum }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.prometheus.port | quote }}
+        {{- if .Values.exafunction.annotations }}
+        {{- toYaml .Values.exafunction.annotations | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ .Values.moduleRepository.serviceAccountName | default (include "exadeploy.serviceAccountName" .) | quote }}
+      {{- if .Values.moduleRepository.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.moduleRepository.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.moduleRepository.tolerations }}
+      tolerations:
+      {{- toYaml .Values.moduleRepository.tolerations | nindent 6 }}
+      {{- end }}
+      containers:
+      - name: module-repository
+        image: {{ required "A valid moduleRepository.image is required." .Values.moduleRepository.image }}
+        args : [
+          "-config=/etc/config/exafunction_config.pbtxt",
+        ]
+        ports:
+        - containerPort: {{ .Values.moduleRepository.port }}
+          protocol: TCP
+        - name: metrics
+          containerPort: {{ .Values.prometheus.port }}
+          protocol: TCP
+        resources:
+          requests:
+            memory: "3.5Gi"
+            cpu: "1"
+          limits:
+            memory: "3.5Gi"
+        {{- if and (eq .Values.moduleRepository.backend.type "remote") (eq .Values.moduleRepository.backend.remote.dataBackend "s3") }}
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ required "A valid moduleRepository.backend.remote.s3.awsAccessKeySecret.name is required." .Values.moduleRepository.backend.remote.s3.awsAccessKeySecret.name | quote }}
+              key: {{ required "A valid moduleRepository.backend.remote.s3.awsAccessKeySecret.accessKeyIdKey is required." .Values.moduleRepository.backend.remote.s3.awsAccessKeySecret.accessKeyIdKey | quote }}
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ required "A valid moduleRepository.backend.remote.s3.awsAccessKeySecret.name is required." .Values.moduleRepository.backend.remote.s3.awsAccessKeySecret.name | quote }}
+              key: {{ required "A valid moduleRepository.backend.remote.s3.awsAccessKeySecret.secretAccessKeyKey is required." .Values.moduleRepository.backend.remote.s3.awsAccessKeySecret.secretAccessKeyKey | quote }}
+        {{- end }}
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/config"
+          readOnly: true
+        {{- if eq .Values.moduleRepository.backend.type "remote" }}
+        - name: system-secrets
+          mountPath: /etc/system_secrets
+          readOnly: true
+        {{- end }}
+        {{- if and (eq .Values.moduleRepository.backend.type "remote") .Values.moduleRepository.backend.remote.postgres.sslConfigMapName }}
+        - name: ssl-cert
+          mountPath: /etc/ssl-cert
+          readOnly: true
+        {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: exafunction-config{{- include "exadeploy.suffix" . }}
+      {{- if eq .Values.moduleRepository.backend.type "remote" }}
+      - name: system-secrets
+        projected:
+          sources:
+          - secret:
+              name: {{ required "A valid moduleRepository.backend.remote.postgres.passwordSecret.name is required." .Values.moduleRepository.backend.remote.postgres.passwordSecret.name | quote }}
+              items:
+              - key: {{ required "A valid moduleRepository.backend.remote.postgres.passwordSecret.key is required." .Values.moduleRepository.backend.remote.postgres.passwordSecret.key | quote }}
+                path: postgres_password
+      {{- end }}
+      {{- if and (eq .Values.moduleRepository.backend.type "remote") .Values.moduleRepository.backend.remote.postgres.sslConfigMapName }}
+      - name: ssl-cert
+        configMap:
+          name: {{ .Values.moduleRepository.backend.remote.postgres.sslConfigMapName }}
+      {{- end }}

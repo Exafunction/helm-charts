@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  {{- if .Values.scheduler.service.annotations }}
+  annotations:
+    {{- toYaml .Values.scheduler.service.annotations | nindent 4 }}
+  {{- end }}
+  name: scheduler-service{{- include "exadeploy.suffix" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "exadeploy.labels" . | nindent 4 }}
+spec:
+  ports:
+  - name: grpc
+    port: {{ .Values.scheduler.port }}
+    targetPort: {{ .Values.scheduler.port }}
+  selector:
+    app: scheduler{{- include "exadeploy.suffix" . }}
+  type: {{ .Values.scheduler.service.type }}

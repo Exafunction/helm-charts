@@ -1,0 +1,25 @@
+---
+# Source: exadeploy/templates/scheduler-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/load-balancer-type: Internal
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+  name: scheduler-service
+  namespace: default
+  labels:
+    helm.sh/chart: exadeploy-1.0.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ports:
+  - name: grpc
+    port: 50050
+    targetPort: 50050
+  selector:
+    app: scheduler
+  type: LoadBalancer

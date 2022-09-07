@@ -1,0 +1,76 @@
+---
+# Source: exadeploy/templates/scheduler-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler-example
+  namespace: default
+  labels:
+    app: scheduler-example
+    helm.sh/chart: exadeploy-1.0.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: scheduler-example
+  template:
+    metadata:
+      labels:
+        app: scheduler-example
+      annotations:
+        checksum/config: b9d072586f7a1be7ae75bac055bfd46abf78b068c036f93ec12f110a5b10d531
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "21120"
+        my-annotation: my-value
+    spec:
+      serviceAccountName: "my-scheduler-serviceaccount"
+      nodeSelector:
+        role: scheduler
+      tolerations:
+      - effect: NoSchedule
+        key: dedicated
+        operator: Equal
+        value: scheduler
+      containers:
+      - name: scheduler
+        image: foo.us-west-1.amazonaws.com/scheduler:bar_1234
+        args : [
+          "-config=/etc/config/exafunction_config.pbtxt",
+        ]
+        env:
+          - name: EXA_SCHEDULER_EXTRA_ENV
+            value: my-value
+        ports:
+        - containerPort: 50
+          protocol: TCP
+        - name: metrics
+          containerPort: 21120
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "10200m"
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/config"
+          readOnly: true
+        - name: system-secrets
+          mountPath: /etc/system_secrets
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: exafunction-config-example
+      - name: system-secrets
+        projected:
+          sources:
+          - secret:
+              name: "api-key-secret"
+              items:
+              - key: "api_key_custom"
+                path: api_key

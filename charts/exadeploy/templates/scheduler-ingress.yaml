@@ -1,0 +1,24 @@
+{{- if .Values.scheduler.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: scheduler{{- include "exadeploy.suffix" . }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- toYaml .Values.scheduler.ingress.annotations | nindent 4 }}
+  labels:
+    {{- include "exadeploy.labels" . | nindent 4 }}
+spec:
+  ingressClassName: {{ .Values.scheduler.ingress.className }}
+  rules:
+  - host: {{ required "A valid scheduler.ingress.host is required" .Values.scheduler.ingress.host | quote }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: scheduler-service{{- include "exadeploy.suffix" . }}
+            port:
+              number: {{ .Values.scheduler.port }}
+        path: /
+        pathType: Prefix
+{{- end }}

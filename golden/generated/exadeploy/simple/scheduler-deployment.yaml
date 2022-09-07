@@ -1,0 +1,65 @@
+---
+# Source: exadeploy/templates/scheduler-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler
+  namespace: default
+  labels:
+    app: scheduler
+    helm.sh/chart: exadeploy-1.0.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: scheduler
+  template:
+    metadata:
+      labels:
+        app: scheduler
+      annotations:
+        checksum/config: 21e5319948cfd8492623cf2557abf5b98fbfdd0ccdeaaecaebd9891d1e53393c
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2112"
+    spec:
+      serviceAccountName: "exadeploy"
+      containers:
+      - name: scheduler
+        image: foo.us-west-1.amazonaws.com/scheduler:bar_1234
+        args : [
+          "-config=/etc/config/exafunction_config.pbtxt",
+        ]
+        ports:
+        - containerPort: 50050
+          protocol: TCP
+        - name: metrics
+          containerPort: 2112
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "2.5"
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/config"
+          readOnly: true
+        - name: system-secrets
+          mountPath: /etc/system_secrets
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: exafunction-config
+      - name: system-secrets
+        projected:
+          sources:
+          - secret:
+              name: "api-key-secret"
+              items:
+              - key: "api_key"
+                path: api_key

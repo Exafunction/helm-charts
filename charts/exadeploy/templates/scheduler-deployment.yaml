@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler{{- include "exadeploy.suffix" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: scheduler{{- include "exadeploy.suffix" . }}
+    {{- include "exadeploy.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: scheduler{{- include "exadeploy.suffix" . }}
+  template:
+    metadata:
+      labels:
+        app: scheduler{{- include "exadeploy.suffix" . }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/exafunction-configmap.yaml") . | sha256sum }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: {{ .Values.prometheus.port | quote }}
+        {{- if .Values.exafunction.annotations }}
+        {{- toYaml .Values.exafunction.annotations | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ .Values.scheduler.serviceAccountName | default (include "exadeploy.serviceAccountName" .) | quote }}
+      {{- if .Values.scheduler.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.scheduler.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.scheduler.tolerations }}
+      tolerations:
+      {{- toYaml .Values.scheduler.tolerations | nindent 6 }}
+      {{- end }}
+      containers:
+      - name: scheduler
+        image: {{ required "A valid scheduler.image is required." .Values.scheduler.image }}
+        args : [
+          "-config=/etc/config/exafunction_config.pbtxt",
+        ]
+        {{- if .Values.scheduler.extraEnvs }}
+        env:
+          {{- toYaml .Values.scheduler.extraEnvs | nindent 10 }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.scheduler.port }}
+          protocol: TCP
+        - name: metrics
+          containerPort: {{ .Values.prometheus.port }}
+          protocol: TCP
+        resources:
+          limits:
+            cpu: {{ .Values.scheduler.cpuLimit | quote }}
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/config"
+          readOnly: true
+        - name: system-secrets
+          mountPath: /etc/system_secrets
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: exafunction-config{{- include "exadeploy.suffix" . }}
+      - name: system-secrets
+        projected:
+          sources:
+          - secret:
+              name: {{ required "A valid exafunction.apiKeySecret.name is required." .Values.exafunction.apiKeySecret.name | quote }}
+              items:
+              - key: {{ required "A valid exafunction.apiKeySecret.key is required." .Values.exafunction.apiKeySecret.key | quote }}
+                path: api_key

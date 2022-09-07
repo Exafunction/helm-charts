@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: module-repository-service{{- include "exadeploy.suffix" . }}
+  namespace: {{ .Release.Namespace }}
+  {{- if .Values.moduleRepository.service.annotations }}
+  annotations:
+    {{- toYaml .Values.moduleRepository.service.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "exadeploy.labels" . | nindent 4 }}
+spec:
+  ports:
+  - name: grpc
+    port: {{ .Values.moduleRepository.port }}
+    targetPort: {{ .Values.moduleRepository.port }}
+  selector:
+    app: module-repository{{- include "exadeploy.suffix" . }}
+  type: {{ .Values.moduleRepository.service.type }}

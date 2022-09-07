@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        exclude: golden/generated
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.17
+    hooks:
+      - id: helmlint
+        name: helm-lint
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.10.0
+    hooks:
+      - id: helm-docs-built
+        name: helm-docs
+        args:
+          - --chart-search-root=charts
+  - repo: local
+    hooks:
+      - id: golden
+        name: helm-goldens
+        entry: ./golden/generate.sh
+        language: script
+        require_serial: true
+  - repo: https://github.com/Agilicus/pre-commit-hook-k8svalidate.git
+    rev: v0.1.0
+    hooks:
+      - id: k8svalidate
+        name: k8s-validate-goldens
+        files: golden/generated/.*.yaml

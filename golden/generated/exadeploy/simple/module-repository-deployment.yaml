@@ -1,0 +1,55 @@
+---
+# Source: exadeploy/templates/module-repository-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-repository
+  namespace: default
+  labels:
+    app: module-repository
+    helm.sh/chart: exadeploy-1.0.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: module-repository
+  template:
+    metadata:
+      labels:
+        app: module-repository
+      annotations:
+        checksum/config: 21e5319948cfd8492623cf2557abf5b98fbfdd0ccdeaaecaebd9891d1e53393c
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2112"
+    spec:
+      serviceAccountName: "exadeploy"
+      containers:
+      - name: module-repository
+        image: foo.us-west-1.amazonaws.com/moduleRepository:bar_1234
+        args : [
+          "-config=/etc/config/exafunction_config.pbtxt",
+        ]
+        ports:
+        - containerPort: 50051
+          protocol: TCP
+        - name: metrics
+          containerPort: 2112
+          protocol: TCP
+        resources:
+          requests:
+            memory: "3.5Gi"
+            cpu: "1"
+          limits:
+            memory: "3.5Gi"
+        volumeMounts:
+        - name: config
+          mountPath: "/etc/config"
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: exafunction-config

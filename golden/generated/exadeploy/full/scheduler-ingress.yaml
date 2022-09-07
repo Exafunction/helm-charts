@@ -1,0 +1,28 @@
+---
+# Source: exadeploy/templates/scheduler-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: scheduler-example
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: GRPC
+  labels:
+    helm.sh/chart: exadeploy-1.0.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "scheduler.custom.domain"
+    http:
+      paths:
+      - backend:
+          service:
+            name: scheduler-service-example
+            port:
+              number: 50
+        path: /
+        pathType: Prefix
