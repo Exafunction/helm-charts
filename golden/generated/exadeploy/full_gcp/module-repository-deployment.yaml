@@ -7,7 +7,7 @@ metadata:
   namespace: default
   labels:
     app: module-repository-example
-    helm.sh/chart: exadeploy-1.0.0
+    helm.sh/chart: exadeploy-1.1.0
     app.kubernetes.io/name: exadeploy
     app.kubernetes.io/instance: exadeploy
     app.kubernetes.io/version: "0.10.0"
@@ -22,7 +22,7 @@ spec:
       labels:
         app: module-repository-example
       annotations:
-        checksum/config: b9d072586f7a1be7ae75bac055bfd46abf78b068c036f93ec12f110a5b10d531
+        checksum/config: 3842c2f0d42e20542170e8a84e71a730780fb75c3266eff5bfec46874e36a74f
         prometheus.io/scrape: "true"
         prometheus.io/port: "21120"
         my-annotation: my-value
@@ -37,7 +37,7 @@ spec:
         value: module-repository
       containers:
       - name: module-repository
-        image: foo.us-west-1.amazonaws.com/moduleRepository:bar_1234
+        image: gcr.io/foo/moduleRepository:bar_1234
         args : [
           "-config=/etc/config/exafunction_config.pbtxt",
         ]
@@ -54,16 +54,8 @@ spec:
           limits:
             memory: "3.5Gi"
         env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: "aws-secret"
-              key: "access_key_custom"
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: "aws-secret"
-              key: "secret_key_custom"
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: "/etc/credentials/gcp-credentials.json"
         volumeMounts:
         - name: config
           mountPath: "/etc/config"
@@ -74,18 +66,25 @@ spec:
         - name: ssl-cert
           mountPath: /etc/ssl-cert
           readOnly: true
+        - name: gcp-credentials
+          mountPath: "/etc/credentials/"
+          readOnly: true
       volumes:
       - name: config
         configMap:
           name: exafunction-config-example
       - name: system-secrets
-        projected:
-          sources:
-          - secret:
-              name: "postgres-secret"
-              items:
-              - key: "postgres_password_custom"
-                path: postgres_password
+        secret:
+          secretName: "postgres-secret"
+          items:
+          - key: "postgres_password_custom"
+            path: postgres_password
       - name: ssl-cert
         configMap:
           name: postgres-ssl-cmap
+      - name: gcp-credentials
+        secret:
+          secretName: "gcp-secret"
+          items:
+          - key: "gcp_credentials_json_custom"
+            path: gcp-credentials.json

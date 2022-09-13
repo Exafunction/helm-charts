@@ -1,0 +1,97 @@
+---
+# Source: exadeploy/templates/exafunction-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: exafunction-config-example
+  namespace: default
+  labels:
+    helm.sh/chart: exadeploy-1.1.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  exafunction_config.pbtxt: |+
+    module_repository {
+      listen_port: 51
+      hostname: "modulerepository.custom.domain"
+      external_port: 80
+      internal_hostname: "module-repository-service-example.default.svc.custom.domain"
+      cache_dir: "/tmp/module_repository/cache"
+      max_cache_size_in_gb: 50
+      postgres_metadata_backend {}
+      gcs_data_backend {
+        bucket: "my-bucket"
+        base_dir: "/module_repository"
+      }
+      my-config: "my-value"
+    }
+    
+    scheduler {
+      hostname: "scheduler-service-example"
+      listen_port: 50
+      session_reinitialization_first_heartbeat_timeout_seconds: 60
+      placement_group_deletion_lag_seconds: 50
+      log_invocation_time: true
+      min_runners: 2
+      max_runners: 10
+      runner_creation_timeout_seconds: 6000
+      max_consecutive_runner_creation_failures: 5
+      runner_create_failure_cooldown_seconds: 100
+      runner_service_creation_timeout_seconds: 600
+      runner_deletion_lag_seconds: 50
+      load_balancing_enabled: true
+      autoscaling_enabled: true
+      autoscaling_config {}
+      use_runner_image_from_module: true
+      my-config: "my-value"
+    }
+    
+    runner {
+      cpu_only: true
+      kubernetes_launch_backend {
+        docker_image: "gcr.io/foo/runner:bar_1234",
+        runner_port: 100
+        value_store_port: 101
+        namespace: "default"
+        memory_limit: "10Gi"
+        cpu_limit: "2400m"    
+        pod_annotations {
+          key: "my-annotation"
+          value: "my-value"
+        }    
+        node_selectors {
+          key: "role"
+          value: "runner"
+        }
+        tolerations {
+          key: "dedicated"
+          operator: "Equal"
+          value: "runner"
+          effect: "NoSchedule"
+        }
+        runner_pod_app_label_value: "exafunction-runner-example"
+        runner_service_app_label_value: "exafunction-runner-service-example"
+        runner_pod_name_suffix: "example"
+        create_headless_service: true
+        subdomain: "headless-example"
+        service_account_name: "my-runner-serviceaccount"
+        external_service_hostname: ""
+      }
+      value_store_threads: 40
+      serialize_all: true
+      load_from_blob_storage: true
+      my-config: "my-value"
+    }
+    
+    metrics_export_port: 21120
+    postgres_name: "my-postgres"
+    postgres_host: "postgres.custom.domain"
+    postgres_user: "my-user"
+    postgres_port: 54320
+    postgres_ssl_cert_path: "/etc/ssl-cert/postgres-ssl-cert"
+    
+    billing_addr: "https://billing.exafunction.com"
+    
+    kubernetes_secret_dir: "/etc/system_secrets"

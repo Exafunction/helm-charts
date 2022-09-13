@@ -4,7 +4,7 @@
 
 A Helm chart for the ExaDeploy system by Exafunction.
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.10.0](https://img.shields.io/badge/AppVersion-0.10.0-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.10.0](https://img.shields.io/badge/AppVersion-0.10.0-informational?style=flat-square)
 
 ## Get Helm Repository Info
 
@@ -62,7 +62,8 @@ Example values file:
 
 ```yaml
 exafunction:
-  apiKeySecretName: exafunction-api-key
+  apiKeySecret:
+    name: exafunction-api-key
 ```
 
 ### ExaDeploy Component Images (Required)
@@ -84,9 +85,9 @@ The module repository can be configured to use either a local backend on disk (d
 
 In order to configure a remote backend for the module repository, you must change the `moduleRepository.backend.type` to `remote`, configure the remote Postgres connection, set the `moduleRepository.backend.remote.dataBackend` to the cloud storage provider, and configure the appropriate cloud storage provider settings. Note that the Postgres database and cloud storage bucket must already exist before installing the Helm chart. Additionally, the access information for both must exist as Kubernetes secrets.
 
-By default, the postgres password secret is expected to contain a key named `postgres_password` with the value being the password. The cloud storage secret format is provider-specific. For S3, the secret is expected to contain a key named `access_key` with the value being the access key ID and a key named `secret_key` with the value being the secret access key.
+By default, the postgres password secret is expected to contain a key named `postgres_password` with the value being the password. The cloud storage secret format is provider-specific. For S3, the secret is by default expected to contain a key named `access_key` with the value being the access key ID and a key named `secret_key` with the value being the secret access key. For GCS, the secret is by default expected to contain a key named `gcp-credentials.json` with the value being the GCP JSON credentials file.
 
-Example values file:
+Example values file (AWS):
 
 ```yaml
 moduleRepository:
@@ -97,12 +98,35 @@ moduleRepository:
       port: 5432
       database: "exadeploy"
       user: "exadeploy"
-      passwordSecretName: "postgres-password"
+      passwordSecret:
+        name: "postgres-password"
     dataBackend: "s3"
     s3:
       region: "us-east-1"
       bucket: "exadeploy"
-      awsAccessKeySecretName: "aws-access-key"
+      awsAccessKeySecret:
+        name: "aws-access-key"
+```
+
+Example values file (GCP):
+
+```yaml
+moduleRepository:
+  backend:
+    type: "remote"
+    postgres:
+      host: "postgres.example.com"
+      port: 5432
+      database: "exadeploy"
+      user: "exadeploy"
+      passwordSecret:
+        name: "postgres-password"
+    dataBackend: "gcs"
+    gcs:
+      region: "us-east1"
+      bucket: "exadeploy"
+      gcpCredentialsSecret:
+        name: "gcs-gcp-credentials"
 ```
 
 ### Kubernetes Scheduling
@@ -151,6 +175,9 @@ runner:
 | moduleRepository.additionalConfig | string | `""` | Additional module repository config settings in yaml format. |
 | moduleRepository.backend.local.localMetadataBaseDir | string | `"/tmp/exafunction/module_repository/metadata"` | Location to store metadata for the local metadata backend. |
 | moduleRepository.backend.remote.dataBackend | string | `"s3"` | Module repository data backend type. Must be one of [s3] |
+| moduleRepository.backend.remote.gcs.bucket | string | `nil` | Name of the GCS bucket used to store module repository objects. |
+| moduleRepository.backend.remote.gcs.gcpCredentialsSecret.gcpCredentialsJsonKey | string | `"gcp-credentials.json"` | Key in <name> Kubernetes secret with GCP credentials JSON value. |
+| moduleRepository.backend.remote.gcs.gcpCredentialsSecret.name | string | `nil` | Name of Kubernetes secret containing GCP credentials to access the GCS bucket. |
 | moduleRepository.backend.remote.postgres.database | string | `nil` | Name of the Postgres database. |
 | moduleRepository.backend.remote.postgres.host | string | `nil` | Host (address) of the Postgres instance. |
 | moduleRepository.backend.remote.postgres.passwordSecret.key | string | `"postgres_password"` | Key in <name> Kubernetes secret with Postgres password value. |

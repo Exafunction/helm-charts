@@ -1,14 +1,14 @@
 ---
-# Source: exadeploy/templates/module-repository-ingress.yaml
+# Source: exadeploy/templates/scheduler-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: module-repository-example
+  name: scheduler-example
   namespace: default
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
   labels:
-    helm.sh/chart: exadeploy-1.0.0
+    helm.sh/chart: exadeploy-1.1.0
     app.kubernetes.io/name: exadeploy
     app.kubernetes.io/instance: exadeploy
     app.kubernetes.io/version: "0.10.0"
@@ -16,13 +16,13 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: "modulerepository.custom.domain"
+  - host: "scheduler.custom.domain"
     http:
       paths:
       - backend:
           service:
-            name: module-repository-service-example
+            name: scheduler-service-example
             port:
-              number: 51
+              number: 50
         path: /
         pathType: Prefix

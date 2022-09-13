@@ -1,0 +1,15 @@
+---
+# Source: exadeploy/templates/runner-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless-example
+spec:
+  selector:
+    app: exafunction-runner-example
+  clusterIP: None
+  ports:
+  - name: runner-port
+    port: 100
+  - name: value-store-port
+    port: 101

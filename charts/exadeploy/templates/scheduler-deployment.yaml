@@ -65,10 +65,8 @@ spec:
         configMap:
           name: exafunction-config{{- include "exadeploy.suffix" . }}
       - name: system-secrets
-        projected:
-          sources:
-          - secret:
-              name: {{ required "A valid exafunction.apiKeySecret.name is required." .Values.exafunction.apiKeySecret.name | quote }}
-              items:
-              - key: {{ required "A valid exafunction.apiKeySecret.key is required." .Values.exafunction.apiKeySecret.key | quote }}
-                path: api_key
+        secret:
+          secretName: {{ required "A valid exafunction.apiKeySecret.name is required." .Values.exafunction.apiKeySecret.name | quote }}
+          items:
+          - key: {{ required "A valid exafunction.apiKeySecret.key is required." .Values.exafunction.apiKeySecret.key | quote }}
+            path: api_key

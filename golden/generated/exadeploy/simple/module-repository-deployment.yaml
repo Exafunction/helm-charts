@@ -7,7 +7,7 @@ metadata:
   namespace: default
   labels:
     app: module-repository
-    helm.sh/chart: exadeploy-1.0.0
+    helm.sh/chart: exadeploy-1.1.0
     app.kubernetes.io/name: exadeploy
     app.kubernetes.io/instance: exadeploy
     app.kubernetes.io/version: "0.10.0"
@@ -22,7 +22,7 @@ spec:
       labels:
         app: module-repository
       annotations:
-        checksum/config: 21e5319948cfd8492623cf2557abf5b98fbfdd0ccdeaaecaebd9891d1e53393c
+        checksum/config: 519be68986ffa8e541b2c87f68281c6355ff5c08eb14acb2f72a8a0c026b7a13
         prometheus.io/scrape: "true"
         prometheus.io/port: "2112"
     spec:
