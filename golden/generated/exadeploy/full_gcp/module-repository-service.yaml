@@ -1,16 +1,16 @@
 ---
-# Source: exadeploy/templates/scheduler-service.yaml
+# Source: exadeploy/templates/module-repository-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
+  name: module-repository-service-example
+  namespace: default
   annotations:
     cloud.google.com/load-balancer-type: Internal
     service.beta.kubernetes.io/aws-load-balancer-internal: "true"
     service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-  name: scheduler-service-example
-  namespace: default
   labels:
-    helm.sh/chart: exadeploy-1.0.0
+    helm.sh/chart: exadeploy-1.1.0
     app.kubernetes.io/name: exadeploy
     app.kubernetes.io/instance: exadeploy
     app.kubernetes.io/version: "0.10.0"
@@ -18,8 +18,8 @@ metadata:
 spec:
   ports:
   - name: grpc
-    port: 50
-    targetPort: 50
+    port: 51
+    targetPort: 51
   selector:
-    app: scheduler-example
+    app: module-repository-example
   type: LoadBalancer

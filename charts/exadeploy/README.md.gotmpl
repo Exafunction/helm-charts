@@ -64,7 +64,8 @@ Example values file:
 
 ```yaml
 exafunction:
-  apiKeySecretName: exafunction-api-key
+  apiKeySecret:
+    name: exafunction-api-key
 ```
 
 ### ExaDeploy Component Images (Required)
@@ -86,9 +87,9 @@ The module repository can be configured to use either a local backend on disk (d
 
 In order to configure a remote backend for the module repository, you must change the `moduleRepository.backend.type` to `remote`, configure the remote Postgres connection, set the `moduleRepository.backend.remote.dataBackend` to the cloud storage provider, and configure the appropriate cloud storage provider settings. Note that the Postgres database and cloud storage bucket must already exist before installing the Helm chart. Additionally, the access information for both must exist as Kubernetes secrets.
 
-By default, the postgres password secret is expected to contain a key named `postgres_password` with the value being the password. The cloud storage secret format is provider-specific. For S3, the secret is expected to contain a key named `access_key` with the value being the access key ID and a key named `secret_key` with the value being the secret access key.
+By default, the postgres password secret is expected to contain a key named `postgres_password` with the value being the password. The cloud storage secret format is provider-specific. For S3, the secret is by default expected to contain a key named `access_key` with the value being the access key ID and a key named `secret_key` with the value being the secret access key. For GCS, the secret is by default expected to contain a key named `gcp-credentials.json` with the value being the GCP JSON credentials file.
 
-Example values file:
+Example values file (AWS):
 
 ```yaml
 moduleRepository:
@@ -99,12 +100,35 @@ moduleRepository:
       port: 5432
       database: "exadeploy"
       user: "exadeploy"
-      passwordSecretName: "postgres-password"
+      passwordSecret:
+        name: "postgres-password"
     dataBackend: "s3"
     s3:
       region: "us-east-1"
       bucket: "exadeploy"
-      awsAccessKeySecretName: "aws-access-key"
+      awsAccessKeySecret:
+        name: "aws-access-key"
+```
+
+Example values file (GCP):
+
+```yaml
+moduleRepository:
+  backend:
+    type: "remote"
+    postgres:
+      host: "postgres.example.com"
+      port: 5432
+      database: "exadeploy"
+      user: "exadeploy"
+      passwordSecret:
+        name: "postgres-password"
+    dataBackend: "gcs"
+    gcs:
+      region: "us-east1"
+      bucket: "exadeploy"
+      gcpCredentialsSecret:
+        name: "gcs-gcp-credentials"
 ```
 
 ### Kubernetes Scheduling

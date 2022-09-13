@@ -1,0 +1,28 @@
+---
+# Source: exadeploy/templates/module-repository-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: module-repository-example
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: GRPC
+  labels:
+    helm.sh/chart: exadeploy-1.1.0
+    app.kubernetes.io/name: exadeploy
+    app.kubernetes.io/instance: exadeploy
+    app.kubernetes.io/version: "0.10.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "modulerepository.custom.domain"
+    http:
+      paths:
+      - backend:
+          service:
+            name: module-repository-service-example
+            port:
+              number: 51
+        path: /
+        pathType: Prefix

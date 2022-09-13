@@ -18,6 +18,11 @@ module_repository {
     bucket: {{ required "A valid moduleRepository.backend.remote.s3.bucket is required." .Values.moduleRepository.backend.remote.s3.bucket | quote }}
     base_dir: "/module_repository"
   }
+  {{- else if eq .Values.moduleRepository.backend.remote.dataBackend "gcs" }}
+  gcs_data_backend {
+    bucket: {{ required "A valid moduleRepository.backend.remote.gcs.bucket is required." .Values.moduleRepository.backend.remote.gcs.bucket | quote }}
+    base_dir: "/module_repository"
+  }
   {{- else }}
   {{ fail "Invalid .Values.moduleRepository.backend.remote.dataBackend" }}
   {{- end }}

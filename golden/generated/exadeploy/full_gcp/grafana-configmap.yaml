@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: exafunction-grafana-dashboard
+  name: exafunction-grafana-dashboard-example
   namespace: default
   labels:
     helm.sh/chart: exadeploy-1.1.0
@@ -1347,8 +1347,8 @@ data:
           {
             "current": {
               "selected": false,
-              "text": "runner",
-              "value": "runner"
+              "text": "runner-example",
+              "value": "runner-example"
             },
             "description": null,
             "error": null,
@@ -1358,19 +1358,19 @@ data:
             "options": [
               {
                 "selected": true,
-                "text": "runner",
-                "value": "runner"
+                "text": "runner-example",
+                "value": "runner-example"
               }
             ],
-            "query": "runner",
+            "query": "runner-example",
             "skipUrlSync": false,
             "type": "textbox"
           },
           {
             "current": {
               "selected": false,
-              "text": "scheduler",
-              "value": "scheduler"
+              "text": "scheduler-example",
+              "value": "scheduler-example"
             },
             "description": null,
             "error": null,
@@ -1380,11 +1380,11 @@ data:
             "options": [
               {
                 "selected": true,
-                "text": "scheduler",
-                "value": "scheduler"
+                "text": "scheduler-example",
+                "value": "scheduler-example"
               }
             ],
-            "query": "scheduler",
+            "query": "scheduler-example",
             "skipUrlSync": false,
             "type": "textbox"
           },

@@ -7,7 +7,7 @@ metadata:
   namespace: default
   labels:
     app: scheduler-example
-    helm.sh/chart: exadeploy-1.0.0
+    helm.sh/chart: exadeploy-1.1.0
     app.kubernetes.io/name: exadeploy
     app.kubernetes.io/instance: exadeploy
     app.kubernetes.io/version: "0.10.0"
@@ -24,7 +24,7 @@ spec:
       labels:
         app: scheduler-example
       annotations:
-        checksum/config: b9d072586f7a1be7ae75bac055bfd46abf78b068c036f93ec12f110a5b10d531
+        checksum/config: 7204983db1e906c7de93fe53415c2d0e2af2ec9d04b40c1c73610b2f459e375c
         prometheus.io/scrape: "true"
         prometheus.io/port: "21120"
         my-annotation: my-value
@@ -67,10 +67,8 @@ spec:
         configMap:
           name: exafunction-config-example
       - name: system-secrets
-        projected:
-          sources:
-          - secret:
-              name: "api-key-secret"
-              items:
-              - key: "api_key_custom"
-                path: api_key
+        secret:
+          secretName: "api-key-secret"
+          items:
+          - key: "api_key_custom"
+            path: api_key

@@ -125,6 +125,14 @@ moduleRepository:
           accessKeyIdKey: "access_key"
           # -- Key in <name> Kubernetes secret with AWS secret access key value.
           secretAccessKeyKey: "secret_key"
+      gcs:
+        # -- Name of the GCS bucket used to store module repository objects.
+        bucket: null
+        gcpCredentialsSecret:
+          # -- Name of Kubernetes secret containing GCP credentials to access the GCS bucket.
+          name: null
+          # -- Key in <name> Kubernetes secret with GCP credentials JSON value.
+          gcpCredentialsJsonKey: "gcp-credentials.json"
   # -- Optional specific serviceAccountName for the module repository.
   serviceAccountName: null
   # -- Additional module repository config settings in yaml format.

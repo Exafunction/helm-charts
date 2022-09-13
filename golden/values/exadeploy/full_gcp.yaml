@@ -1,0 +1,106 @@
+exafunction:
+  apiKeySecret:
+    name: "api-key-secret"
+    key: "api_key_custom"
+  suffix: "example"
+  annotations:
+    my-annotation: "my-value"
+  clusterDomain: "custom.domain"
+
+scheduler:
+  image: "gcr.io/foo/scheduler:bar_1234"
+  port: 50
+  cpuLimit: "10200m"
+  nodeSelector:
+    role: "scheduler"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "scheduler"
+      effect: "NoSchedule"
+  ingress:
+    enabled: true
+    className: "nginx"
+    host: "scheduler.custom.domain"
+  serviceAccountName: "my-scheduler-serviceaccount"
+  extraEnvs:
+    - name: "EXA_SCHEDULER_EXTRA_ENV"
+      value: "my-value"
+  placementGroupDeletionLagSeconds: 50
+  runnerCreationTimeoutSeconds: 6000
+  runnerDeletionLagSeconds: 50
+  minRunners: 2
+  maxRunners: 10
+  disableClientsKillingRunners: false
+  additionalConfig: |-
+    my-config: "my-value"
+
+moduleRepository:
+  image: "gcr.io/foo/moduleRepository:bar_1234"
+  port: 51
+  nodeSelector:
+    role: "module-repository"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "module-repository"
+      effect: "NoSchedule"
+  ingress:
+    enabled: true
+    className: nginx
+    host: "modulerepository.custom.domain"
+  backend:
+    type: "remote"
+    remote:
+      postgres:
+        host: "postgres.custom.domain"
+        port: 54320
+        database: "my-postgres"
+        user: "my-user"
+        passwordSecret:
+          name: "postgres-secret"
+          key: "postgres_password_custom"
+        sslCertificateName: "postgres-ssl-cert"
+        sslConfigMapName: "postgres-ssl-cmap"
+      dataBackend: "gcs"
+      gcs:
+        bucket: "my-bucket"
+        gcpCredentialsSecret:
+          name: "gcp-secret"
+          gcpCredentialsJsonKey: "gcp_credentials_json_custom"
+  serviceAccountName: "my-module-repository-serviceaccount"
+  additionalConfig: |-
+    my-config: "my-value"
+
+runner:
+  image: "gcr.io/foo/runner:bar_1234"
+  port: 100
+  valueStorePort: 101
+  cpuLimit: "2400m"
+  memoryLimit: "10Gi"
+  nodeSelector:
+    role: "runner"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "runner"
+      effect: "NoSchedule"
+  createHeadlessService: true
+  serviceAccountName: "my-runner-serviceaccount"
+  cpuOnly: true
+  valueStoreThreads: 40
+  serializeAll: true
+  additionalConfig: |-
+    my-config: "my-value"
+
+prometheus:
+  port: 21120
+
+rbac:
+  create: false
+
+serviceAccount:
+  create: false
+  name: "my-serviceaccount"
+  annotations:
+    my-annotation: "my-value"

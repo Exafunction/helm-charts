@@ -3,10 +3,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: scheduler
+  name: scheduler-example
   namespace: default
   labels:
-    app: scheduler
+    app: scheduler-example
     helm.sh/chart: exadeploy-1.1.0
     app.kubernetes.io/name: exadeploy
     app.kubernetes.io/instance: exadeploy
@@ -18,32 +18,43 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: scheduler
+      app: scheduler-example
   template:
     metadata:
       labels:
-        app: scheduler
+        app: scheduler-example
       annotations:
-        checksum/config: 519be68986ffa8e541b2c87f68281c6355ff5c08eb14acb2f72a8a0c026b7a13
+        checksum/config: 3842c2f0d42e20542170e8a84e71a730780fb75c3266eff5bfec46874e36a74f
         prometheus.io/scrape: "true"
-        prometheus.io/port: "2112"
+        prometheus.io/port: "21120"
+        my-annotation: my-value
     spec:
-      serviceAccountName: "exadeploy"
+      serviceAccountName: "my-scheduler-serviceaccount"
+      nodeSelector:
+        role: scheduler
+      tolerations:
+      - effect: NoSchedule
+        key: dedicated
+        operator: Equal
+        value: scheduler
       containers:
       - name: scheduler
-        image: foo.us-west-1.amazonaws.com/scheduler:bar_1234
+        image: gcr.io/foo/scheduler:bar_1234
         args : [
           "-config=/etc/config/exafunction_config.pbtxt",
         ]
+        env:
+          - name: EXA_SCHEDULER_EXTRA_ENV
+            value: my-value
         ports:
-        - containerPort: 50050
+        - containerPort: 50
           protocol: TCP
         - name: metrics
-          containerPort: 2112
+          containerPort: 21120
           protocol: TCP
         resources:
           limits:
-            cpu: "2.5"
+            cpu: "10200m"
         volumeMounts:
         - name: config
           mountPath: "/etc/config"
@@ -54,10 +65,10 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: exafunction-config
+          name: exafunction-config-example
       - name: system-secrets
         secret:
           secretName: "api-key-secret"
           items:
-          - key: "api_key"
+          - key: "api_key_custom"
             path: api_key

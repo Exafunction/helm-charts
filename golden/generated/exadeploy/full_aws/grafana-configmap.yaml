@@ -6,7 +6,7 @@ metadata:
   name: exafunction-grafana-dashboard-example
   namespace: default
   labels:
-    helm.sh/chart: exadeploy-1.0.0
+    helm.sh/chart: exadeploy-1.1.0
     app.kubernetes.io/name: exadeploy
     app.kubernetes.io/instance: exadeploy
     app.kubernetes.io/version: "0.10.0"
