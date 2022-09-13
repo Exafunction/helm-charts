@@ -3,6 +3,16 @@ entries:
   exadeploy:
   - apiVersion: v2
     appVersion: 0.10.0
+    created: "2022-09-13T19:20:42.708163824Z"
+    description: A Helm chart for the ExaDeploy system by Exafunction.
+    digest: dc88f941db7489f00fb4f860c8fc1abd61a34dfd7d47381419d3ece8a2d2633d
+    name: exadeploy
+    type: application
+    urls:
+    - https://github.com/Exafunction/helm-charts/releases/download/exadeploy-1.1.0/exadeploy-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
+    appVersion: 0.10.0
     created: "2022-09-07T21:38:49.194857473Z"
     description: A Helm chart for the ExaDeploy system by Exafunction.
     digest: cf2aafb3df0827235d381290a2c3a71f8d93dc4ff6eefcdb0f1d376a70e4f829
@@ -872,4 +882,4 @@ entries:
     urls:
     - https://Exafunction.github.io/helm-charts/exafunction-demo-kitti-0.1.0.tgz
     version: 0.1.0
-generated: "2022-09-07T21:38:49.195558781Z"
+generated: "2022-09-13T19:20:42.708922053Z"
