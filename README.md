@@ -1,6 +1,6 @@
 # Exafunction Helm Charts
 
-<img src="images/banner.png" alt="Banner" width="1280"/>
+<img src="https://raw.githubusercontent.com/Exafunction/helm-charts/main/images/banner.png" alt="Banner" width="1280"/>
 
 This repository contains the Helm charts provided by Exafunction.
 
