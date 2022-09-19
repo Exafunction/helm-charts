@@ -7,7 +7,7 @@ metadata:
   namespace: default
   labels:
     app: scheduler
-    helm.sh/chart: exadeploy-1.1.0
+    helm.sh/chart: exadeploy-1.1.1
     app.kubernetes.io/name: exadeploy
     app.kubernetes.io/instance: exadeploy
     app.kubernetes.io/version: "0.10.0"
@@ -24,7 +24,7 @@ spec:
       labels:
         app: scheduler
       annotations:
-        checksum/config: 519be68986ffa8e541b2c87f68281c6355ff5c08eb14acb2f72a8a0c026b7a13
+        checksum/config: c8c1e8e70e628685431d0cd139d49f4e2f0328999eebf70987db43d5cb1b27e9
         prometheus.io/scrape: "true"
         prometheus.io/port: "2112"
     spec:
