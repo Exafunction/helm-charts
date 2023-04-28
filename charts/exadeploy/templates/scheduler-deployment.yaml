@@ -50,9 +50,10 @@ spec:
         - name: metrics
           containerPort: {{ .Values.prometheus.port }}
           protocol: TCP
+        {{- if .Values.scheduler.resources }}
         resources:
-          limits:
-            cpu: {{ .Values.scheduler.cpuLimit | quote }}
+          {{- toYaml .Values.scheduler.resources | nindent 10 }}
+        {{- end }}
         volumeMounts:
         - name: config
           mountPath: "/etc/config"

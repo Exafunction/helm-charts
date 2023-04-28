@@ -199,6 +199,10 @@ runner:
 | moduleRepository.ingress.host | string | `nil` | Module repository ingress host. |
 | moduleRepository.nodeSelector | object | `{}` | Module repository nodeSelectors. Should be a map from label names to label values. |
 | moduleRepository.port | int | `50051` | Port to expose the module repository on. |
+| moduleRepository.resources.limits.cpu | string | `"1"` | Module repository Kubernetes CPU limit. |
+| moduleRepository.resources.limits.memory | string | `"3.5Gi"` | Module repository Kubernetes memory limit. |
+| moduleRepository.resources.requests.cpu | string | `"1"` | Module repository Kubernetes CPU request. |
+| moduleRepository.resources.requests.memory | string | `"3.5Gi"` | Module repository Kubernetes memory request. |
 | moduleRepository.service.annotations | object | `{"cloud.google.com/load-balancer-type":"Internal","service.beta.kubernetes.io/aws-load-balancer-internal":"true","service.beta.kubernetes.io/azure-load-balancer-internal":"true"}` | Module repository service annotations. |
 | moduleRepository.service.type | string | `"LoadBalancer"` | Module repository service type. |
 | moduleRepository.serviceAccountName | string | `nil` | Optional specific serviceAccountName for the module repository. |
@@ -222,7 +226,6 @@ runner:
 | runner.valueStorePort | int | `50101` | Port to expose value store on. |
 | runner.valueStoreThreads | int | `4` | Number of threads for value store. |
 | scheduler.additionalConfig | string | `""` | Additional scheduler config settings in yaml format. |
-| scheduler.cpuLimit | string | `"2.5"` | Scheduler Kubernetes CPU limit. |
 | scheduler.disableClientsKillingRunners | bool | `false` | Normally, the scheduler will delete runners which clients fail to connect to. This disables that behavior to allow for inspection of the failed runners. |
 | scheduler.extraEnvs | list | `[]` | Extra environment variables for the scheduler. |
 | scheduler.image | string | `nil` | Image path for the scheduler. |
@@ -235,6 +238,10 @@ runner:
 | scheduler.nodeSelector | object | `{}` | Scheduler nodeSelectors. Should be a map from label names to label values. |
 | scheduler.placementGroupDeletionLagSeconds | int | `5` | Number of seconds to wait before deleting unused placement group from runners. |
 | scheduler.port | int | `50050` | Port to expose the scheduler on. |
+| scheduler.resources.limits.cpu | string | `"2.5"` | Scheduler Kubernetes CPU limit. |
+| scheduler.resources.limits.memory | string | `"5Gi"` | Scheduler Kubernetes memory limit. |
+| scheduler.resources.requests.cpu | string | `"2.5"` | Scheduler Kubernetes CPU request. |
+| scheduler.resources.requests.memory | string | `"5Gi"` | Scheduler Kubernetes memory request. |
 | scheduler.runnerCreationTimeoutSeconds | int | `600` | Number of seconds to wait for runner creation. |
 | scheduler.runnerDeletionLagSeconds | int | `5` | Number of seconds to wait before deleting unused runner. |
 | scheduler.service.annotations | object | `{"cloud.google.com/load-balancer-type":"Internal","service.beta.kubernetes.io/aws-load-balancer-internal":"true","service.beta.kubernetes.io/azure-load-balancer-internal":"true"}` | Scheduler service annotations. |

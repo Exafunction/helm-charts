@@ -44,12 +44,10 @@ spec:
         - name: metrics
           containerPort: {{ .Values.prometheus.port }}
           protocol: TCP
+        {{- if .Values.moduleRepository.resources }}
         resources:
-          requests:
-            memory: "3.5Gi"
-            cpu: "1"
-          limits:
-            memory: "3.5Gi"
+          {{- toYaml .Values.moduleRepository.resources | nindent 10 }}
+        {{- end }}
         {{- if eq .Values.moduleRepository.backend.type "remote" }}
         env:
         {{- if eq .Values.moduleRepository.backend.remote.dataBackend "s3"}}

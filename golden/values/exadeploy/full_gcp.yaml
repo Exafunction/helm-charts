@@ -10,7 +10,6 @@ exafunction:
 scheduler:
   image: "gcr.io/foo/scheduler:bar_1234"
   port: 50
-  cpuLimit: "10200m"
   nodeSelector:
     role: "scheduler"
   tolerations:
@@ -22,6 +21,10 @@ scheduler:
     enabled: true
     className: "nginx"
     host: "scheduler.custom.domain"
+  resources:
+    limits:
+      cpu: "10200m"
+      memory: "10Gi"
   serviceAccountName: "my-scheduler-serviceaccount"
   extraEnvs:
     - name: "EXA_SCHEDULER_EXTRA_ENV"

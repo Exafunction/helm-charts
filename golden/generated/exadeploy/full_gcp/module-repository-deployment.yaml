@@ -48,11 +48,12 @@ spec:
           containerPort: 21120
           protocol: TCP
         resources:
-          requests:
-            memory: "3.5Gi"
-            cpu: "1"
           limits:
-            memory: "3.5Gi"
+            cpu: "1"
+            memory: 3.5Gi
+          requests:
+            cpu: "1"
+            memory: 3.5Gi
         env:
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: "/etc/credentials/gcp-credentials.json"
