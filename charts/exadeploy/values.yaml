@@ -16,8 +16,6 @@ scheduler:
   image: null
   # -- Port to expose the scheduler on.
   port: 50050
-  # -- Scheduler Kubernetes CPU limit.
-  cpuLimit: "2.5"
   # -- Scheduler nodeSelectors. Should be a map from label names to label values.
   nodeSelector: {}
   # -- Scheduler tolerations. Should be a list of objects with keys [key, operator, value (unnecessary when operator is "Exists"), effect].
@@ -40,6 +38,17 @@ scheduler:
     # -- Scheduler ingress annotations.
     annotations:
       nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+  resources:
+    requests:
+      # -- Scheduler Kubernetes CPU request.
+      cpu: "2.5"
+      # -- Scheduler Kubernetes memory request.
+      memory: "5Gi"
+    limits:
+      # -- Scheduler Kubernetes CPU limit.
+      cpu: "2.5"
+      # -- Scheduler Kubernetes memory limit.
+      memory: "5Gi"
   # -- Optional specific serviceAccountName for the scheduler.
   serviceAccountName: null
   # -- Extra environment variables for the scheduler.
@@ -86,6 +95,17 @@ moduleRepository:
     # -- Module repository ingress annotations.
     annotations:
       nginx.ingress.kubernetes.io/backend-protocol: GRPC
+  resources:
+    requests:
+      # -- Module repository Kubernetes CPU request.
+      cpu: "1"
+      # -- Module repository Kubernetes memory request.
+      memory: "3.5Gi"
+    limits:
+      # -- Module repository Kubernetes CPU limit.
+      cpu: "1"
+      # -- Module repository Kubernetes memory limit.
+      memory: "3.5Gi"
   backend:
     # -- Module repository backend type. Must be one of [local, remote].
     type: "local"

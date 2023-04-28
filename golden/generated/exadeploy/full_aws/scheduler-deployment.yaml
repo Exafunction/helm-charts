@@ -54,7 +54,11 @@ spec:
           protocol: TCP
         resources:
           limits:
-            cpu: "10200m"
+            cpu: 10200m
+            memory: 10Gi
+          requests:
+            cpu: "2.5"
+            memory: 5Gi
         volumeMounts:
         - name: config
           mountPath: "/etc/config"
